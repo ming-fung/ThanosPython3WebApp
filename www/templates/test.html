@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test users - Thanos Python Webapp</title>
+</head>
+<body>
+    <h1>All users</h1>
+
+    {% for user in users %}
+        <p>{{user.name}} / {{user.email}}</p>
+    {% endfor %}
+
+</body>
+</html>

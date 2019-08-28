@@ -1,4 +1,4 @@
-#!/root/awesome-python3-webapp/venv/bin/python3
+#!/Users/milknero/Works/Technology/Python/Project/ThanosPython3WebApp/venv/bin/python3.7
 # -*- coding: utf-8 -*-
 import re
 import sys

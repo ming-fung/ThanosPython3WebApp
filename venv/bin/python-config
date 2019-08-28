@@ -1,4 +1,4 @@
-#!/root/awesome-python3-webapp/venv/bin/python
+#!/Users/milknero/Works/Technology/Python/Project/ThanosPython3WebApp/venv/bin/python
 
 import sys
 import getopt
