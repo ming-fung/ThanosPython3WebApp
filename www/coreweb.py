@@ -21,6 +21,7 @@ def handle_url_xxx(request):
 相当于将 handle_url_xxx = get('/api/comments')(handle_url_xxx)，接受函数作为参数并返回包装后的函数
 '''
 
+
 def get(path):
     '''
     Define decorator @get('/path')
@@ -35,6 +36,7 @@ def get(path):
         wrapper.__route__ = path
         return wrapper
     return decorator
+
 
 def post(path):
     '''
@@ -51,6 +53,7 @@ def post(path):
         return wrapper
     return decorator
 
+
 def get_required_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
@@ -58,6 +61,7 @@ def get_required_kw_args(fn):
         if param.kind == inspect.Parameter.KEYWORD_ONLY and param.default == inspect.Parameter.empty:
             args.append(name)
     return tuple(args)
+
 
 def get_named_kw_args(fn):
     args = []
@@ -67,17 +71,20 @@ def get_named_kw_args(fn):
             args.append(name)
     return tuple(args)
 
+
 def has_named_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
             return True
 
+
 def has_var_kw_arg(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.VAR_KEYWORD:
             return True
+
 
 def has_request_arg(fn):
     sig = inspect.signature(fn)
@@ -90,6 +97,7 @@ def has_request_arg(fn):
         if found and (param.kind != inspect.Parameter.VAR_POSITIONAL and param.kind != inspect.Parameter.KEYWORD_ONLY and param.kind != inspect.Parameter.VAR_KEYWORD):
             raise ValueError('request parameter must be the last named parameter in function: %s%s' % (fn.__name__, str(sig)))
     return found
+
 
 # 由于URL的处理函数不一定是coroutine，所以用 RequestHandler 来封装URL的处理函数，从URL函数中分析其需要接收的参数
 class RequestHandler(object):
@@ -155,10 +163,12 @@ class RequestHandler(object):
         r = await self._func(**kw)
         return r
 
+
 def add_static(app):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     app.router.add_static('/static/', path)
     logging.info('add static %s => %s' % ('/static/', path))
+
 
 # 注册URL处理函数，例如（像这里的handles.index其实已经是@get或@post装饰过的函数，所以会有__method__和__route__）
 # add_route(app, handles.index)
@@ -170,10 +180,11 @@ def add_route(app, fn):
     path = getattr(fn, '__route__', None)
     if path is None or method is None:
         raise ValueError('@get or @post not defined in %s.' % str(fn))
-    if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
-        fn = asyncio.coroutine(fn)
+    # if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
+    #     fn = asyncio.coroutine(fn)
     logging.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ','.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
+
 
 # 改良成自动扫描某模块下的所有符合条件的函数，进行注册
 # add_routes(app, 'handlers')

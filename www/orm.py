@@ -34,10 +34,10 @@ async def select(sql, args, size=None):
                 rs = await cur.fetchmany(size) #子协程
             else:
                 rs = await cur.fetchall()
-        logging.info('rows returned: %s' % len(rs))
+            logging.info('rows returned: %s' % len(rs))
             #以上，多处的await代表了多次IO操作，但因为该函数使用@asyncio.coroutine来并发（线程内 协程）执行任务，所以IO并不蔽塞线程，只是多增加了系统在消息轮询中读取消息队列、切换函数（跳转到上次执行到的位置）的操作。
             #with中的await可使用async with代替
-        return rs
+            return rs
 
 #insert update delete
 async def execute(sql, args, autocommit=True):
@@ -200,6 +200,14 @@ class Model(dict, metaclass=ModelMetaclass):
         if len(rs) == 0:
             return None
         return rs[0]['_num_']
+
+    @classmethod
+    async def find(cls, pk):
+        ' find object by primary key. '
+        rs = await select('%s where `%s`=?' % (cls.__select__, cls.__primary_key__), [pk], 1)
+        if len(rs) == 0:
+            return None
+        return cls(**rs[0])
 
     async def save(self):
         args = list(map(self.getValueOrDefault, self.__fields__))
