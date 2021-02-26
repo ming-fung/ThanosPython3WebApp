@@ -1,4 +1,4 @@
-aiohttp==3.5.4
+aiohttp==3.7.4
 aiomysql==0.0.20
 apis==0.0.1
 argh==0.26.2
